@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context path="/Avaliacao1_TurmaB">
+  <ResourceLink global="jdbc/ConsultasDB" name="jdbc/ConsultasDBLocal" type="javax.sql.DataSource"/>
+</Context>
