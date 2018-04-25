@@ -48,8 +48,5 @@ public class Consulta {
     public void setDataExame(Date dataExame) {
         this.dataExame = dataExame;
     }
-
-    
-    
     
 }

@@ -5,13 +5,20 @@
  */
 package br.ufscar.dc.consultas.servlets;
 
+import br.ufscar.dc.consultas.beans.Consulta;
+import br.ufscar.dc.consultas.daos.ConsultaDAO;
+import br.ufscar.dc.consultas.daos.MedicoDAO;
+import br.ufscar.dc.consultas.daos.PacienteDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
+import javax.annotation.Resource;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
 
 /**
  *
@@ -29,21 +36,47 @@ public class listarConsultasServlet extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
+    @Resource(name = "jdbc/ConsultasDBLocal")
+    DataSource dataSource;
+    
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet listarConsultasServlet</title>");            
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet listarConsultasServlet at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
-        }
+                String tipo = request.getParameter("tipo");
+                List<Consulta> todasConsultas = null;
+                ConsultaDAO cdao = new ConsultaDAO(dataSource);
+
+                switch(tipo){
+                        case "paciente":
+                            String cpf = request.getParameter("cpf");
+                            System.out.println(cpf);
+                            try {
+                                todasConsultas = cdao.listarTodasConsultasPorPaciente(cpf);
+                                request.setAttribute("listaConsultas", todasConsultas);
+                                request.getRequestDispatcher("listaConsultas.jsp").forward(request, response);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                request.setAttribute("mensagem", e.getLocalizedMessage());
+                                request.getRequestDispatcher("erro.jsp").forward(request, response);
+                            }
+                            break;
+                        case "medico":
+                            String crm = request.getParameter("crm");
+                            try {
+                                todasConsultas = cdao.listarTodasConsultasPorMedico(crm);
+                                request.setAttribute("listaConsultas", todasConsultas);
+                                request.getRequestDispatcher("listaConsultas.jsp").forward(request, response);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                request.setAttribute("mensagem", e.getLocalizedMessage());
+                                request.getRequestDispatcher("erro.jsp").forward(request, response);
+                            }
+                            break;
+                        default:
+                            break;
+                }
+            
+
+
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

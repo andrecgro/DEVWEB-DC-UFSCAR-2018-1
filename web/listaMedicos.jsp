@@ -11,7 +11,7 @@
         <h1>Médicos Cadastrados</h1>
         <hr>
         <div class="container">
-            <input type="button" value="Voltar" onclick()="history.back()"> </input>
+            
             <c:if test="${empty requestScope.listaMedicos}">
                 Não há médicos!
             </c:if>

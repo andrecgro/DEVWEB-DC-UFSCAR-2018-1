@@ -5,7 +5,7 @@
  */
 package br.ufscar.dc.consultas.servlets;
 
-import br.ufscar.br.consultas.forms.LoginForm;
+import br.ufscar.dc.consultas.forms.LoginForm;
 import br.ufscar.dc.consultas.beans.Usuario;
 import br.ufscar.dc.consultas.daos.UsuarioDAO;
 import java.io.IOException;

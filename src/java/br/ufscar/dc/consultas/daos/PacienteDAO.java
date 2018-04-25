@@ -96,29 +96,29 @@ public class PacienteDAO {
     }
     
     
-    public List<Paciente> listarTodosPacientesPorSelecao(String selecao) throws SQLException {
+    public List<Paciente> buscarPaciente(String cpf) throws SQLException {
         List<Paciente> ret = new ArrayList<>();
         try (Connection con = dataSource.getConnection();
             PreparedStatement ps = con.prepareStatement(BUSCAR_PACIENTE_SQL)) {
 
 
-            ps.setString(1, selecao);
+            ps.setString(1, cpf);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                Paciente m = new Paciente();
+                Paciente p = new Paciente();
                 Usuario u = new Usuario();
-                m.setId(rs.getInt("pacienteId"));
-                m.setCpf(rs.getString("cpf"));
-                m.setDataDeNascimento(new Date(rs.getDate("dataDeNascimento").getTime()));
-                m.setSexo(rs.getString("sexo"));
-                m.setTelefone(rs.getString("telefone"));
+                p.setId(rs.getInt("pacienteId"));
+                p.setCpf(rs.getString("cpf"));
+                p.setDataDeNascimento(new Date(rs.getDate("dataDeNascimento").getTime()));
+                p.setSexo(rs.getString("sexo"));
+                p.setTelefone(rs.getString("telefone"));
                 u.setId(rs.getInt("usuarioId"));
                 u.setNome(rs.getString("nome"));
                 u.setNomeLogin(rs.getString("nomeLogin"));
                 u.setSenha(rs.getString("senha"));
                 u.setAdmin(rs.getBoolean("admin"));
-                m.setUsuario(u);
-                ret.add(m);
+                p.setUsuario(u);
+                ret.add(p);
             }
         }
         return ret;
