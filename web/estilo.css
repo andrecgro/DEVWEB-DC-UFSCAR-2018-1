@@ -1,0 +1,228 @@
+/* http://meyerweb.com/eric/tools/css/reset/ 
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section {
+	display: block;
+}
+body {
+	line-height: 1;
+}
+ol, ul {
+	list-style: none;
+}
+blockquote, q {
+	quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+	content: '';
+	content: none;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+body {
+    height: 700px;
+    background-color: #c3e4bd;
+    font-family: 'Helvetica Neue', sans-serif;
+}
+h1{
+    text-align:center;
+    font-weight: bold;
+    font-size:20px;
+}
+div.container-login{
+    position: absolute;
+    width: 400px;
+    background-color: #f2fff2;
+    border-radius: 10px;
+    padding: 30px 60px;
+    left: 50%;
+    top: 50%;
+    margin-top: -200px;
+    margin-left: -240px;
+    
+}
+div.container .warning-login{
+    color: #c52424;
+    margin-top: -20px;
+    padding: 1px;
+    font-size:18px;
+    font-weight:bold;
+}
+input[type="text"],
+input[type="password"]{
+    height: 30px;
+    width: 95%;
+    padding:5px;
+    margin: 10px 0px -5px;
+}
+label{
+    font-color:#c8c8c8;
+}
+button{
+    margin-top:10px;
+    width: 100%;
+    padding: 7px;
+    font-size: 18px;
+    color: #fff;
+    background-color: #737b74;
+    
+}
+button:hover,
+input#frm1_submit:hover{
+    cursor:pointer;
+    background-color:#3f4440;
+}
+input#frm1_submit {
+    margin-top: -15px;
+    width: 100%;
+    padding: 7px;
+    font-size: 18px;
+    color: #fff;
+    background-color: #737b74;
+}
+form.form-listar{
+    margin-top:10px;
+}
+form.form-listar input{
+    margin-top:2px;
+}
+.warning-login {
+    background-color: #ffe7e7;
+    width: 100%;
+    margin-top: -30px;
+    padding: 11px;
+    margin-bottom: 10px;
+    border-bottom-left-radius:10px;
+    border-bottom-right-radius:10px;
+}
+.warning-login p{
+    color: #af5f5f;
+    font-size: 17px;
+    font-weight: bold;
+}
+
+.container-table{
+    width: 900px;
+    position: absolute;
+    margin-left: -450px;
+    left: 50%;
+    padding: 50px;
+}
+.container-table table{
+    width: 100%;
+    text-align: center;
+}
+
+.container-table table tbody {
+    background-color: #fff;
+    border: 2px solid gray;
+    border-radius: 10px;
+    padding: 21px;
+}
+
+.container-table table th{
+    font-weight:bold;
+    padding-top:5px;
+    border-left: 1px solid;
+}
+.container-table table tr {
+    border: 1px solid;
+    padding: 3px;
+    height: 31px;
+}
+.container-table table td {
+    padding-top:5px;
+    border-left:1px solid;
+}
+
+.container.container-forms {
+    width: 900px;
+    position: absolute;
+    margin-left: -500px;
+    left: 50%;
+    padding: 50px;
+    background-color: #f2fff2;
+}
+.container.container-forms input[type="text"], 
+.container.container-forms input[type="password"]
+{
+    height: 30px;
+    width: 95%;
+    padding: 5px;
+    margin: 5px 0px 15px;
+}
+.container.container-forms input[type="date"]{
+    height:30px;
+    padding: 5px;
+    margin: 5px 0px 15px;
+}
+
+h1.title {
+    margin: 50px 0px 25px;
+}
+h2 {
+    font-size: 20px;
+    margin: 10px 0px;
+}
+
+div.container .warning{
+    color: #c52424;
+    padding: 10px;
+    font-size:14px;
+    font-weight:bold;
+}
+
+.warning{
+    background-color: #ffe7e7;
+    width: 100%;
+    padding: 11px;
+    margin-bottom: 10px;
+}
+.warning p{
+    color: #af5f5f;
+    font-size: 14px;
+    font-weight: bold;
+}
+.container-forms.loggedIn{
+    text-align:center;
+}
+a.methodButtons{
+    width:100px;
+    height:70px;
+    padding:10px;
+    font-size: 18px;
+    color: #fff;
+    background-color: #737b74;
+    text-decoration: none;
+}
+a.methodButtons:hover{
+    cursor:pointer;
+    background-color:#3f4440;
+}

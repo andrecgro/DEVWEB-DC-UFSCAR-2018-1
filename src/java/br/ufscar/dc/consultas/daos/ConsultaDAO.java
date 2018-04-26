@@ -14,9 +14,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
@@ -27,24 +30,28 @@ import javax.sql.DataSource;
 public class ConsultaDAO {
     
     private final static String CRIAR_CONSULTA_SQL = "INSERT INTO Consultas"
-            + " (medico, paciente, data_exame)"
+            + " (crmmedico, cpfpaciente, dataexame)"
             + " VALUES (?, ?, ?)";
 
     private final static String LISTAR_CONSULTAS_PACIENTE_SQL = "SELECT"
-        + "c.id AS consultaId, c.data_exame"
-        + "m.crm, u.nome, m.especialidade"
-        + "FROM Consultas c INNER JOIN Medicos m ON c.crmmedico = m.crm"
-        + "INNER JOIN Pacientes p on c.cpfpaciente = p.cpf"
-        + "INNER JOIN Usuarios u on u.id = m.usuario"
-        + "WHERE paciente=?";
+        + " c.id AS consultaId, c.dataexame,"
+        + " m.crm, u.nome AS medicoNome, m.especialidade, p.cpf"
+        + " FROM Consultas c INNER JOIN Medicos m ON c.crmmedico = m.crm"
+        + " INNER JOIN Pacientes p on c.cpfpaciente = p.cpf"
+        + " INNER JOIN Usuarios u on u.id = m.usuarioid"
+        + " WHERE cpfpaciente=?";
     
     private final static String LISTAR_CONSULTAS_MEDICO_SQL = "SELECT"
-        + "c.id AS consultaId, c.data_exame"
-        + "p.cpf, p.nome, p.telefone, p.sexo, p.data_de_nascimento"
-        + "FROM Consulta c INNER JOIN Paciente p ON c.cpfpaciente = p.cpf"
-        + "INNER JOIN Medico m on c.crmmedico = m.crm"
-        + "INNER JOIN Usuarios u on u.id = p.usuario"
-        + "WHERE medico=?";
+        + " c.id AS consultaId, c.dataexame,"
+        + " p.cpf, u.nome, p.telefone, p.sexo, p.datadenascimento"
+        + " FROM Consultas c INNER JOIN Pacientes p ON c.cpfpaciente = p.cpf"
+        + " INNER JOIN Medicos m on c.crmmedico = m.crm"
+        + " INNER JOIN Usuarios u on u.id = p.usuarioid"
+        + " WHERE crmmedico=?";
+    
+    private final static String BUSCAR_CONSULTAS_POR_CRM_E_CPF_E_DATA = "SELECT *"
+        + " FROM Consultas"
+        + " WHERE (crmmedico=? OR cpfpaciente=?) AND dataexame=?";
     
     DataSource dataSource;
 
@@ -52,16 +59,32 @@ public class ConsultaDAO {
     public ConsultaDAO(DataSource dataSource) {
         this.dataSource = dataSource;
     }
+    public Boolean checaConsultaCpfCrmData(String cpf, String crm, String data) throws SQLException, NamingException {
+        try (Connection con = dataSource.getConnection();
+            PreparedStatement ps = con.prepareStatement(BUSCAR_CONSULTAS_POR_CRM_E_CPF_E_DATA)) {
+            ps.setString(1, crm);
+            ps.setString(2, cpf);
+            ps.setString(3, data);
+
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if(rs.next()){
+                    return true;
+                }
+                else{
+                    return false;
+                }
+            }
+        }
+    }
     
     public Consulta gravarConsulta(Consulta c) throws SQLException, NamingException {
         try (Connection con = dataSource.getConnection();
-            
             PreparedStatement ps = con.prepareStatement(CRIAR_CONSULTA_SQL, Statement.RETURN_GENERATED_KEYS);) {
             ps.setString(1, c.getMedico().getCrm());
             ps.setString(2, c.getPaciente().getCpf());
-            ps.setDate(3,  new java.sql.Date(c.getDataExame().getTime()));
+            ps.setDate(3, new java.sql.Date(c.getDataExame().getTime()));
             ps.execute();
-
 
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 rs.next();
@@ -71,21 +94,22 @@ public class ConsultaDAO {
         return c;
     }
 
-    public List<Consulta> listarTodasConsultasPorPaciente() throws SQLException, NamingException {
+    public List<Consulta> listarTodasConsultasPorPaciente(String cpf) throws SQLException, NamingException {
         List<Consulta> ret = new ArrayList<>();
         try (Connection con = dataSource.getConnection();
                 PreparedStatement ps = con.prepareStatement(LISTAR_CONSULTAS_PACIENTE_SQL)) {
-
-
+            
+                ps.setString(1, cpf);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     Consulta c = new Consulta();
                     Medico m = new Medico();
                     Usuario u = new Usuario();
+                    
                     c.setId(rs.getInt("consultaId"));
-                    c.setDataExame(new Date(rs.getDate("dataExame").getTime()));                    
+                    c.setDataExame(rs.getDate("dataExame"));
                     m.setCrm(rs.getString("crm"));
-                    u.setNome(rs.getString("nome"));
+                    u.setNome(rs.getString("medicoNome"));
                     m.setEspecialidade(rs.getString("especialidade"));
                     m.setUsuario(u);
                     c.setMedico(m);
@@ -96,19 +120,19 @@ public class ConsultaDAO {
         return ret;
     }
     
-    public List<Consulta> listarTodasConsultasPorMedico() throws SQLException, NamingException {
+    public List<Consulta> listarTodasConsultasPorMedico(String crm) throws SQLException, NamingException {
         List<Consulta> ret = new ArrayList<>();
         try (Connection con = dataSource.getConnection();
                 PreparedStatement ps = con.prepareStatement(LISTAR_CONSULTAS_MEDICO_SQL)) {
 
-
+                ps.setString(1, crm);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     Consulta c = new Consulta();
                     Paciente p = new Paciente();
                     Usuario u = new Usuario();
                     c.setId(rs.getInt("consultaId"));
-                    c.setDataExame(new Date(rs.getDate("dataExame").getTime()));
+                    c.setDataExame(rs.getDate("dataExame"));
                     u.setNome(rs.getString("nome"));
                     p.setCpf(rs.getString("cpf"));
                     p.setSexo(rs.getString("sexo"));

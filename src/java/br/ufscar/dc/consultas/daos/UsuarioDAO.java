@@ -19,15 +19,15 @@ import javax.sql.DataSource;
  * @author miguel
  */
 public class UsuarioDAO {
-    private final static String CRIAR_USUARIO_SQL = "insert into Usuarios"
+    private final static String CRIAR_USUARIO_SQL = "INSERT INTO Usuarios"
             + " (nome, nomeLogin, senha, administrador, tipo)"
-            + " values (?, ?, ?, ?, ?)";
+            + " VALUES (?, ?, ?, ?, ?)";
 
 
-    private final static String BUSCAR_USUARIO_SQL = "select"
+    private final static String BUSCAR_USUARIO_SQL = "SELECT"
             + " nome, nomeLogin, senha, administrador, tipo"
-            + " from Usuarios"
-            + " where nomeLogin=? AND senha= ?";
+            + " FROM Usuarios"
+            + " WHERE nomeLogin=? AND senha= ?";
     
     DataSource dataSource;
 
@@ -35,7 +35,7 @@ public class UsuarioDAO {
     public UsuarioDAO(DataSource dataSource) {
         this.dataSource = dataSource;
     }
-    
+
     public Usuario gravarUsuario(Usuario u) throws SQLException, NamingException {
         try (Connection con = dataSource.getConnection();
                 PreparedStatement ps = con.prepareStatement(CRIAR_USUARIO_SQL, Statement.RETURN_GENERATED_KEYS);) {
