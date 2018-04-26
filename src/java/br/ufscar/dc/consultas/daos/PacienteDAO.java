@@ -24,21 +24,21 @@ import javax.sql.DataSource;
  */
 public class PacienteDAO {
 
-    private final static String CRIAR_PACIENTE_SQL = "insert into Paciente"
-            + " (cpf, data_de_nascimento, sexo, telefone, usuario)"
-            + " values (?, ?, ?, ?, ?)";
+    private final static String CRIAR_PACIENTE_SQL = "INSERT INTO Pacientes"
+            + " (cpf, datadenascimento, sexo, telefone, usuarioid)"
+            + " VALUES (?, ?, ?, ?, ?)";
     
-    private final static String LISTAR_PACIENTES_SQL = "select"
-        + " p.id as pacienteID, p.cpf, p.dataDeNascimento, p.sexo, p.telefone"
-        + " u.id as usuarioId, u.nome, u.nomeLogin, u.administrador"
-        + " from Pacientes p inner join Usuarios u on p.usuario = u.id";
+    private final static String LISTAR_PACIENTES_SQL = "SELECT"
+        + " p.id AS pacienteID, p.cpf, p.dataDeNascimento, p.sexo, p.telefone,"
+        + " u.id AS usuarioId, u.nome, u.nomeLogin, u.administrador"
+        + " FROM Pacientes p INNER JOIN Usuarios u ON p.usuarioid = u.id";
 
 
-    private final static String BUSCAR_PACIENTE_SQL = "select"
-        + " p.id as pacienteID, p.cpf, p.dataDeNascimento, p.sexo, p.telefone"
-        + " u.id as usuarioId, u.nome, u.nomeLogin, u.administrador"
-        + " from Pacientes p inner join Usuarios u on p.usuario = u.id"
-        + " where cpf=?";
+    private final static String BUSCAR_PACIENTE_SQL = "SELECT"
+        + " p.id AS pacienteID, p.cpf, p.dataDeNascimento, p.sexo, p.telefone,"
+        + " u.id AS usuarioId, u.nome, u.nomeLogin, u.administrador"
+        + " FROM Pacientes p INNER JOIN Usuarios u ON p.usuarioid = u.id"
+        + " WHERE cpf=?";
     
     DataSource dataSource;
 
@@ -50,11 +50,15 @@ public class PacienteDAO {
     public Paciente gravarPaciente(Paciente p) throws SQLException, NamingException {
         try (Connection con = dataSource.getConnection();
                 PreparedStatement ps = con.prepareStatement(CRIAR_PACIENTE_SQL, Statement.RETURN_GENERATED_KEYS);) {
+            UsuarioDAO udao = new UsuarioDAO(dataSource);
+            Usuario u = udao.gravarUsuario(p.getUsuario());
             ps.setString(1, p.getCpf());
+
             ps.setDate(2, new java.sql.Date(p.getDataDeNascimento().getTime()));
+
             ps.setString(3, p.getSexo());
             ps.setString(4, p.getTelefone());
-            ps.setInt(5, p.getUsuario().getId());
+            ps.setInt(5, u.getId());
             ps.execute();
 
 
@@ -79,7 +83,7 @@ public class PacienteDAO {
                     Usuario u = new Usuario();
                     m.setId(rs.getInt("pacienteId"));
                     m.setCpf(rs.getString("cpf"));
-                    m.setDataDeNascimento(new Date(rs.getDate("dataDeNascimento").getTime()));
+                    m.setDataDeNascimento(rs.getDate("dataDeNascimento"));
                     m.setSexo(rs.getString("sexo"));
                     m.setTelefone(rs.getString("telefone"));
                     u.setId(rs.getInt("usuarioId"));
@@ -96,32 +100,38 @@ public class PacienteDAO {
     }
     
     
-    public List<Paciente> buscarPaciente(String cpf) throws SQLException {
-        List<Paciente> ret = new ArrayList<>();
+    public Paciente buscarPaciente(String cpf) throws SQLException, NamingException {
         try (Connection con = dataSource.getConnection();
             PreparedStatement ps = con.prepareStatement(BUSCAR_PACIENTE_SQL)) {
 
-
             ps.setString(1, cpf);
             try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                Paciente p = new Paciente();
-                Usuario u = new Usuario();
-                p.setId(rs.getInt("pacienteId"));
-                p.setCpf(rs.getString("cpf"));
-                p.setDataDeNascimento(new Date(rs.getDate("dataDeNascimento").getTime()));
-                p.setSexo(rs.getString("sexo"));
-                p.setTelefone(rs.getString("telefone"));
-                u.setId(rs.getInt("usuarioId"));
-                u.setNome(rs.getString("nome"));
-                u.setNomeLogin(rs.getString("nomeLogin"));
-                u.setSenha(rs.getString("senha"));
-                u.setAdmin(rs.getBoolean("admin"));
-                p.setUsuario(u);
-                ret.add(p);
+                if(rs.next()){
+                    Usuario u = new Usuario();
+                    Paciente p = new Paciente();
+                    u.setNome(rs.getString("nome"));
+                    u.setNomeLogin(rs.getString("nomeLogin"));
+                    p.setId(rs.getInt("pacienteId"));
+                    p.setCpf(rs.getString("cpf"));
+                    p.setTelefone(rs.getString("telefone"));
+                    p.setDataDeNascimento(rs.getDate("dataDeNascimento"));
+                    p.setSexo(rs.getString("sexo"));
+                    p.setUsuario(u);
+                    return p;
+                }
+                else{
+                    return null;
+                }
+            }
+            catch(Exception e){
+                System.out.println(e);
+                return null;
             }
         }
-        return ret;
+        catch (Exception e){
+            System.out.println(e);
+            return null;
         }
     }
+    
 }

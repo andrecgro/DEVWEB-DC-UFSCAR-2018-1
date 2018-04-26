@@ -14,9 +14,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
@@ -46,22 +49,42 @@ public class ConsultaDAO {
         + " INNER JOIN Usuarios u on u.id = p.usuarioid"
         + " WHERE crmmedico=?";
     
+    private final static String BUSCAR_CONSULTAS_POR_CRM_E_CPF_E_DATA = "SELECT *"
+        + " FROM Consultas"
+        + " WHERE (crmmedico=? OR cpfpaciente=?) AND dataexame=?";
+    
     DataSource dataSource;
 
 
     public ConsultaDAO(DataSource dataSource) {
         this.dataSource = dataSource;
     }
+    public Boolean checaConsultaCpfCrmData(String cpf, String crm, String data) throws SQLException, NamingException {
+        try (Connection con = dataSource.getConnection();
+            PreparedStatement ps = con.prepareStatement(BUSCAR_CONSULTAS_POR_CRM_E_CPF_E_DATA)) {
+            ps.setString(1, crm);
+            ps.setString(2, cpf);
+            ps.setString(3, data);
+
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if(rs.next()){
+                    return true;
+                }
+                else{
+                    return false;
+                }
+            }
+        }
+    }
     
     public Consulta gravarConsulta(Consulta c) throws SQLException, NamingException {
         try (Connection con = dataSource.getConnection();
-            
             PreparedStatement ps = con.prepareStatement(CRIAR_CONSULTA_SQL, Statement.RETURN_GENERATED_KEYS);) {
             ps.setString(1, c.getMedico().getCrm());
             ps.setString(2, c.getPaciente().getCpf());
-            ps.setDate(3,  new java.sql.Date(c.getDataExame().getTime()));
+            ps.setDate(3, new java.sql.Date(c.getDataExame().getTime()));
             ps.execute();
-
 
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 rs.next();
@@ -82,8 +105,9 @@ public class ConsultaDAO {
                     Consulta c = new Consulta();
                     Medico m = new Medico();
                     Usuario u = new Usuario();
+                    
                     c.setId(rs.getInt("consultaId"));
-                    c.setDataExame(new Date(rs.getDate("dataExame").getTime()));                    
+                    c.setDataExame(rs.getDate("dataExame"));
                     m.setCrm(rs.getString("crm"));
                     u.setNome(rs.getString("medicoNome"));
                     m.setEspecialidade(rs.getString("especialidade"));
@@ -108,7 +132,7 @@ public class ConsultaDAO {
                     Paciente p = new Paciente();
                     Usuario u = new Usuario();
                     c.setId(rs.getInt("consultaId"));
-                    c.setDataExame(new Date(rs.getDate("dataExame").getTime()));
+                    c.setDataExame(rs.getDate("dataExame"));
                     u.setNome(rs.getString("nome"));
                     p.setCpf(rs.getString("cpf"));
                     p.setSexo(rs.getString("sexo"));

@@ -48,7 +48,6 @@ public class listarConsultasServlet extends HttpServlet {
                 switch(tipo){
                         case "paciente":
                             String cpf = request.getParameter("cpf");
-                            System.out.println(cpf);
                             try {
                                 todasConsultas = cdao.listarTodasConsultasPorPaciente(cpf);
                                 request.setAttribute("listaConsultas", todasConsultas);

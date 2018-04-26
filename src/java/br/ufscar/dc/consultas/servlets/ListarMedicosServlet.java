@@ -40,6 +40,7 @@ public class ListarMedicosServlet extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        
         MedicoDAO mdao = new MedicoDAO(dataSource);
         String especialidade = request.getParameter("especialidade");
         List<Medico> todosMedicos = null;
